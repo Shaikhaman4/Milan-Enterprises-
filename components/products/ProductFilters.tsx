@@ -5,7 +5,7 @@ interface ProductFiltersProps {
   onFilterChange: (filters: {[key: string]: string[]}) => void
 }
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
 
@@ -16,6 +16,93 @@ const ProductFilters = ({ selectedFilters, onFilterChange }: ProductFiltersProps
   useEffect(() => {
     setIsClient(true)
     setOpenSections(['category', 'price'])
+  }, [])
+
+  // Milan products - same as ProductsGrid
+  const allProducts = [
+    {
+      id: '22',
+      name: 'Milan Washing Powder - 1KG',
+      price: 35,
+      category: 'Laundry',
+    },
+    {
+      id: '21',
+      name: 'Milan Bleach Aala Liquid',
+      price: 25,
+      category: 'Household Items',
+    },
+    {
+      id: '20',
+      name: 'Milan Dhamaka Liquid Detergent All Purpose - 1L',
+      price: 50,
+      category: 'Household Items',
+    },
+    {
+      id: '19',
+      name: 'Milan Top Floor Cleaner - 1L',
+      price: 60,
+      category: 'Floor Care',
+    },
+    {
+      id: '17',
+      name: 'Milan Top Super Shine Liquid Soap - 1L',
+      price: 40,
+      category: 'Kitchen',
+    },
+    {
+      id: '18',
+      name: 'Milan Top Super Shine Liquid Soap - 5L',
+      price: 150,
+      category: 'Kitchen',
+    },
+  ]
+
+  // Calculate dynamic counts
+  const filterSections = useMemo(() => {
+    // Count products by category
+    const categoryCounts: {[key: string]: number} = {}
+    allProducts.forEach(product => {
+      categoryCounts[product.category] = (categoryCounts[product.category] || 0) + 1
+    })
+
+    // Count products by price range
+    const priceCounts = {
+      'under-50': 0,
+      '50-100': 0,
+      '100-200': 0,
+      'over-200': 0,
+    }
+
+    allProducts.forEach(product => {
+      if (product.price < 50) priceCounts['under-50']++
+      else if (product.price >= 50 && product.price < 100) priceCounts['50-100']++
+      else if (product.price >= 100 && product.price < 200) priceCounts['100-200']++
+      else priceCounts['over-200']++
+    })
+
+    return [
+      {
+        id: 'category',
+        title: 'Category',
+        options: [
+          { id: 'Floor Care', label: 'Floor Care', count: categoryCounts['Floor Care'] || 0 },
+          { id: 'Kitchen', label: 'Kitchen', count: categoryCounts['Kitchen'] || 0 },
+          { id: 'Household Items', label: 'Household Items', count: categoryCounts['Household Items'] || 0 },
+          { id: 'Laundry', label: 'Laundry', count: categoryCounts['Laundry'] || 0 },
+        ].filter(option => option.count > 0) // Only show categories with products
+      },
+      {
+        id: 'price',
+        title: 'Price Range',
+        options: [
+          { id: 'under-50', label: 'Under ₹50', count: priceCounts['under-50'] },
+          { id: '50-100', label: '₹50 - ₹100', count: priceCounts['50-100'] },
+          { id: '100-200', label: '₹100 - ₹200', count: priceCounts['100-200'] },
+          { id: 'over-200', label: 'Over ₹200', count: priceCounts['over-200'] },
+        ].filter(option => option.count > 0) // Only show price ranges with products
+      },
+    ]
   }, [])
 
   const toggleSection = (section: string) => {
@@ -41,34 +128,6 @@ const ProductFilters = ({ selectedFilters, onFilterChange }: ProductFiltersProps
   const clearAllFilters = () => {
     onFilterChange({})
   }
-
-  const filterSections = [
-    {
-      id: 'category',
-      title: 'Category',
-      options: [
-        { id: 'floor-care', label: 'Floor Care', count: 8 },
-        { id: 'kitchen', label: 'Kitchen', count: 12 },
-        { id: 'bathroom', label: 'Bathroom', count: 6 },
-        { id: 'laundry', label: 'Laundry', count: 5 },
-        { id: 'glass-care', label: 'Glass Care', count: 4 },
-        { id: 'multi-surface', label: 'Multi-Surface', count: 7 },
-        { id: 'refills', label: 'Premium Refills', count: 6 },
-        { id: 'household-items', label: 'Household Items', count: 8 },
-        { id: 'kitchen-essentials', label: 'Kitchen Essentials', count: 6 },
-      ]
-    },
-    {
-      id: 'price',
-      title: 'Price Range',
-      options: [
-        { id: 'under-200', label: 'Under ₹200', count: 15 },
-        { id: '200-400', label: '₹200 - ₹400', count: 25 },
-        { id: '400-600', label: '₹400 - ₹600', count: 8 },
-        { id: 'over-600', label: 'Over ₹600', count: 3 },
-      ]
-    },
-  ]
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">

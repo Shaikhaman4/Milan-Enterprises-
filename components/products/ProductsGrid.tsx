@@ -85,46 +85,33 @@ const ProductsGrid = ({ sortBy, filters }: ProductsGridProps) => {
       // Check each filter category
       for (const [filterKey, filterValues] of Object.entries(filters)) {
         if (filterValues.length > 0) {
-          // Map filter keys to product properties
-          let productValue = ''
           switch (filterKey) {
             case 'category':
-              productValue = product.category
+              if (!filterValues.includes(product.category)) {
+                return false
+              }
               break
-            case 'priceRange':
+            case 'price':
               // Handle price range filtering
               const price = product.price
               const priceInRange = filterValues.some(range => {
                 switch (range) {
-                  case 'under-100':
-                    return price < 100
-                  case '100-300':
-                    return price >= 100 && price <= 300
-                  case '300-500':
-                    return price >= 300 && price <= 500
-                  case 'over-500':
-                    return price > 500
+                  case 'under-50':
+                    return price < 50
+                  case '50-100':
+                    return price >= 50 && price < 100
+                  case '100-200':
+                    return price >= 100 && price < 200
+                  case 'over-200':
+                    return price >= 200
                   default:
                     return false
                 }
               })
               if (!priceInRange) return false
-              continue
-            case 'rating':
-              // Handle rating filtering
-              const rating = product.rating
-              const ratingMatch = filterValues.some(ratingFilter => {
-                const minRating = parseFloat(ratingFilter)
-                return rating >= minRating
-              })
-              if (!ratingMatch) return false
-              continue
+              break
             default:
               continue
-          }
-          
-          if (!filterValues.includes(productValue)) {
-            return false
           }
         }
       }
