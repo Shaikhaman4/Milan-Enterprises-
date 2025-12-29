@@ -32,15 +32,15 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const [isAddingToCart, setIsAddingToCart] = useState(false)
-  const [selectedVariant, setSelectedVariant] = useState(0) // Index of selected variant
+  const [selectedVariant, setSelectedVariant] = useState<number>(0) // Index of selected variant
   const { addItem } = useCartStore()
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore()
   
   const isWishlisted = isInWishlist(product.id)
 
   // Get current price based on selected variant
-  const currentPrice = product.variants ? product.variants[selectedVariant].price : product.price
-  const currentOriginalPrice = product.variants ? product.variants[selectedVariant].originalPrice : product.originalPrice
+  const currentPrice = product.variants ? product.variants[selectedVariant]?.price ?? product.price : product.price
+  const currentOriginalPrice = product.variants ? product.variants[selectedVariant]?.originalPrice : product.originalPrice
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()

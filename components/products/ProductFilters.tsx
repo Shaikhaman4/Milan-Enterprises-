@@ -5,12 +5,18 @@ interface ProductFiltersProps {
   onFilterChange: (filters: {[key: string]: string[]}) => void
 }
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
 
 const ProductFilters = ({ selectedFilters, onFilterChange }: ProductFiltersProps) => {
-  const [openSections, setOpenSections] = useState<string[]>(['category', 'price'])
+  const [openSections, setOpenSections] = useState<string[]>([])
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+    setOpenSections(['category', 'price'])
+  }, [])
 
   const toggleSection = (section: string) => {
     setOpenSections(prev => 
@@ -92,7 +98,7 @@ const ProductFilters = ({ selectedFilters, onFilterChange }: ProductFiltersProps
             </button>
 
             <AnimatePresence>
-              {openSections.includes(section.id) && (
+              {isClient && openSections.includes(section.id) && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
