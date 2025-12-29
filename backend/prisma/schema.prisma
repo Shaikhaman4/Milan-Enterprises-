@@ -1,0 +1,273 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  role      String   @default("CUSTOMER") // UserRole as string
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  addresses Address[]
+  orders    Order[]
+  reviews   Review[]
+  wishlist  WishlistItem[]
+  cart      CartItem[]
+
+  @@map("users")
+}
+
+model Address {
+  id           String  @id @default(uuid())
+  userId       String
+  type         String  // 'shipping', 'billing'
+  firstName    String
+  lastName     String
+  company      String?
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  zipCode      String
+  country      String  @default("US")
+  phone        String?
+  isDefault    Boolean @default(false)
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@map("addresses")
+}
+
+model Category {
+  id          String @id @default(uuid())
+  name        String @unique
+  slug        String @unique
+  description String?
+  image       String?
+  parentId    String?
+  isActive    Boolean @default(true)
+  sortOrder   Int     @default(0)
+
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id               String   @id @default(uuid())
+  name             String
+  slug             String   @unique
+  description      String
+  shortDescription String?
+  price            Float
+  originalPrice    Float?
+  sku              String   @unique
+  barcode          String?
+  weight           Float?
+  dimensions       String?
+  categoryId       String
+  brand            String?
+  isActive         Boolean  @default(true)
+  isFeatured       Boolean  @default(false)
+  isEcoFriendly    Boolean  @default(false)
+  ecoScore         Int      @default(0)
+  effectiveness    Int      @default(0)
+  stockQuantity    Int      @default(0)
+  lowStockThreshold Int     @default(10)
+  tags             String?   // JSON string for SQLite compatibility
+  features         String?   // JSON string for SQLite compatibility  
+  ingredients      String?   // JSON string for SQLite compatibility
+  instructions     String?
+  warnings         String?
+  fragrance        String?
+  size             String?
+  metaTitle        String?
+  metaDescription  String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  category     Category       @relation(fields: [categoryId], references: [id])
+  images       ProductImage[]
+  variants     ProductVariant[]
+  reviews      Review[]
+  orderItems   OrderItem[]
+  cartItems    CartItem[]
+  wishlistItems WishlistItem[]
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(uuid())
+  productId String
+  url       String
+  altText   String?
+  sortOrder Int     @default(0)
+  isMain    Boolean @default(false)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid())
+  productId String
+  name      String
+  value     String
+  price     Float
+  sku       String?
+  stock     Int     @default(0)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_variants")
+}
+
+model CartItem {
+  id        String @id @default(uuid())
+  userId    String
+  productId String
+  quantity  Int
+  variant   String?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId, variant])
+  @@map("cart_items")
+}
+
+model WishlistItem {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("wishlist_items")
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  userId          String
+  orderNumber     String      @unique
+  status          String      @default("PENDING") // OrderStatus as string
+  paymentStatus   String      @default("PENDING") // PaymentStatus as string
+  paymentMethod   String?
+  paymentId       String?
+  subtotal        Float
+  tax             Float
+  shipping        Float
+  discount        Float     @default(0)
+  total           Float
+  currency        String      @default("USD")
+  shippingAddressId String
+  billingAddressId  String?
+  notes           String?
+  trackingNumber  String?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  user            User        @relation(fields: [userId], references: [id])
+  shippingAddress Address     @relation(fields: [shippingAddressId], references: [id])
+  items           OrderItem[]
+  coupons         OrderCoupon[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+  variant   String?
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Coupon {
+  id          String     @id @default(uuid())
+  code        String     @unique
+  type        String
+  value       Float
+  minAmount   Float?
+  maxDiscount Float?
+  usageLimit  Int?
+  usedCount   Int        @default(0)
+  isActive    Boolean    @default(true)
+  startsAt    DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime   @default(now())
+
+  orders OrderCoupon[]
+
+  @@map("coupons")
+}
+
+model OrderCoupon {
+  id       String @id @default(uuid())
+  orderId  String
+  couponId String
+  discount Float
+
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  coupon Coupon @relation(fields: [couponId], references: [id])
+
+  @@map("order_coupons")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  rating    Int
+  title     String?
+  comment   String?
+  isVerified Boolean @default(false)
+  isApproved Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("reviews")
+}
+
+// Note: Using strings instead of enums for SQLite compatibility
+// UserRole: "CUSTOMER" | "ADMIN" | "SUPER_ADMIN"
+// OrderStatus: "PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED"
+// PaymentStatus: "PENDING" | "PAID" | "FAILED" | "REFUNDED"  
+// CouponType: "PERCENTAGE" | "FIXED_AMOUNT" | "FREE_SHIPPING"
