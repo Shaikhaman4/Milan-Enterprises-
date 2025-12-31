@@ -21,6 +21,36 @@ const ProductFilters = ({ selectedFilters, onFilterChange }: ProductFiltersProps
   // Milan products - same as ProductsGrid
   const allProducts = [
     {
+      id: '27',
+      name: 'Milan White Lemon Grass Cleaner - 1L',
+      price: 50,
+      category: 'Household Items',
+    },
+    {
+      id: '26',
+      name: 'Milan Rexipic Toilet Cleaner - 500ml',
+      price: 40,
+      category: 'Bathroom',
+    },
+    {
+      id: '25',
+      name: 'Milan Milon Glass Cleaner',
+      price: 40,
+      category: 'Glass Care',
+    },
+    {
+      id: '24',
+      name: 'Milan Concentrated Camphor Cleaner - 1L',
+      price: 130,
+      category: 'Household Items',
+    },
+    {
+      id: '23',
+      name: 'Milan Comfit - 1L',
+      price: 60,
+      category: 'Household Items',
+    },
+    {
       id: '22',
       name: 'Milan Washing Powder - 1KG',
       price: 35,

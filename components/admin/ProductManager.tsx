@@ -19,6 +19,56 @@ interface Product {
 const ProductManager = () => {
   const [products, setProducts] = useState<Product[]>([
     {
+      id: '27',
+      name: 'Milan White Lemon Grass Cleaner - 1L',
+      price: 50,
+      image: '/products/milan-white-lemon-grass-cleaner.png',
+      category: 'Household Items',
+      features: ['Lemon grass fragrance', 'Natural cleaning power', 'Multi-surface use', 'Fresh scent'],
+      rating: 4.5,
+      reviews: 76,
+    },
+    {
+      id: '26',
+      name: 'Milan Rexipic Toilet Cleaner - 500ml',
+      price: 40,
+      image: '/products/milan-rexipic-toilet-cleaner.png',
+      category: 'Bathroom',
+      features: ['Double action cleaning', 'Superior clearing', 'Germ protection', 'Fresh fragrance'],
+      rating: 4.7,
+      reviews: 92,
+    },
+    {
+      id: '25',
+      name: 'Milan Milon Glass Cleaner',
+      price: 40,
+      image: '/products/milan-milon-glass-cleaner.png',
+      category: 'Glass Care',
+      features: ['Streak-free shine', 'Crystal clear results', 'Easy spray application', 'Quick drying'],
+      rating: 4.6,
+      reviews: 68,
+    },
+    {
+      id: '24',
+      name: 'Milan Concentrated Camphor Cleaner - 1L',
+      price: 130,
+      image: '/products/milan-concentrated-camphor-cleaner.png',
+      category: 'Household Items',
+      features: ['Rose fragrance', 'Concentrated formula', 'Long lasting', 'Premium quality'],
+      rating: 4.8,
+      reviews: 54,
+    },
+    {
+      id: '23',
+      name: 'Milan Comfit - 1L',
+      price: 60,
+      image: '/products/milan-comfit.png',
+      category: 'Household Items',
+      features: ['Comfort formula', 'Gentle on surfaces', 'Pleasant fragrance', 'Effective cleaning'],
+      rating: 4.5,
+      reviews: 83,
+    },
+    {
       id: '22',
       name: 'Milan Washing Powder - 1KG',
       price: 35,
@@ -97,6 +147,8 @@ const ProductManager = () => {
   const categories = [
     'Floor Care',
     'Kitchen',
+    'Bathroom',
+    'Glass Care',
     'Household Items',
     'Laundry'
   ]
